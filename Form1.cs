@@ -25,8 +25,7 @@ namespace qt1
 
             foreach (string s in list)
             {
-                Icon ico = Icon.ExtractAssociatedIcon(s);   //プロセスの実行ファイルのアイコンを取得
-                menu.Items.Add(s, ico.ToBitmap());
+                menu.Items.Add(s, ExtractIcon.GetIcon(s)); //プロセスのフルパスとアイコンをメニューに追加
             }
 
             menu.Items.Add(new ToolStripSeparator()); //最後にセパレーターとCancelを追加
