@@ -17,7 +17,10 @@ namespace qt1
             SetProcessDPIAware(); //高DPIのサポート
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+
+            qtMain qt = new qtMain();
+
+            Application.Run();
         }
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]
