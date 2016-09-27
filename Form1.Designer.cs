@@ -39,6 +39,9 @@
             this.menu.Size = new System.Drawing.Size(61, 4);
             this.menu.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler(this.menu_Closed);
             this.menu.MouseClick += new System.Windows.Forms.MouseEventHandler(this.menu_MouseClick);
+            this.menu.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.menu_PreviewKeyDown);
+            this.menu.KeyDown += new System.Windows.Forms.KeyEventHandler(this.menu_KeyDown);
+            this.menu.KeyUp += new System.Windows.Forms.KeyEventHandler(this.menu_KeyUp);
             // 
             // timer
             // 

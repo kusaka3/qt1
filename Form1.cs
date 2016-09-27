@@ -14,6 +14,8 @@ namespace qt1
     {
 
         Settings appSettings = new Settings(); //app.configの読み込み
+        System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch(); //インクリメンタルサーチの入力期間を量るストップウォッチ
+        string searchString = string.Empty; //インクリメンタルサーチ用の検索文字列
 
         public Form1()
         {
@@ -75,6 +77,66 @@ namespace qt1
             }
         }
 
+        private void menu_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            // 十字キーの左右やエンターが押されてもフォーカスを失わないようにする
+            if (e.KeyCode == Keys.Left || e.KeyCode == Keys.Right || e.KeyCode == Keys.Enter)
+                e.IsInputKey = true;
+
+        }
+
+        private void menu_KeyDown(object sender, KeyEventArgs e)
+        {
+            //デフォルトの挙動(C,D,Eを押すとそのドライブに移動するなど)を無効にする
+            e.SuppressKeyPress = true;
+        }
+
+        private void menu_KeyUp(object sender, KeyEventArgs e)
+        {
+            //Enterキーを押された時の処理をマウスイベントに渡す
+            if (e.KeyCode == Keys.Enter)
+            {
+                MouseButtons m = MouseButtons.Left;
+                if (e.Shift)
+                    m = MouseButtons.Right;
+                if (e.Control)
+                    m = MouseButtons.Middle;
+                menu_MouseClick(null, new MouseEventArgs(m, 1, 0, 0, 0));
+                menu.Close(); //手動でメニューを閉じる
+                return;
+            }
+
+            //インクリメンタルサーチ用の検索文字の入力
+            if (e.KeyCode >= Keys.A && e.KeyCode <= Keys.Z)
+            {
+                if (!sw.IsRunning)
+                {
+                    sw.Start();
+                }
+                else
+                {
+                    if (sw.ElapsedMilliseconds > 1500) //入力を開始してから1.5秒後に検索文字列を破棄
+                    {
+                        sw.Reset();
+                        sw.Stop();
+                        searchString = string.Empty;
+                    }
+                }
+
+                searchString += e.KeyCode.ToString();
+                System.Diagnostics.Debug.WriteLine(searchString);
+                foreach (ToolStripItem i in menu.Items) //検索文字列を含むメニューアイテムを探す
+                {
+                    if (i.Text.ToUpper().Contains(searchString))
+                    {
+
+                        i.Select();
+                        break;
+                    }
+                }
+
+            }
+        }
         /// <summary>
         /// 重複を除いたプロセスの一覧を取得
         /// </summary>
