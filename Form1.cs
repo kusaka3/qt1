@@ -14,6 +14,7 @@ namespace qt1
     {
 
         Settings appSettings = new Settings(); //app.configの読み込み
+        CommandLineArgs CommandLine = new CommandLineArgs();
         System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch(); //インクリメンタルサーチの入力期間を量るストップウォッチ
         string searchString = string.Empty; //インクリメンタルサーチ用の検索文字列
 
@@ -22,12 +23,22 @@ namespace qt1
             InitializeComponent();
 
             List<string> list = new List<string>(); //プロセスのフルパスを格納する
-            list = GetProcess(); //プロセスのリストを取得
+            list = GetProcessList(); //プロセスのリストを取得
             list.Sort(); //プロセスのパスの並べ替え
 
             foreach (string s in list)
             {
-                menu.Items.Add(s, ExtractIcon.GetIcon(s)); //プロセスのフルパスとアイコンをメニューに追加
+                string path = string.Empty;
+
+                if (CommandLine.noPathName) //nopathnameオプション
+                    path = System.IO.Path.GetFileName(s);
+                else
+                    path = s;
+
+                if (CommandLine.noIcons) //noiconsオプション
+                    menu.Items.Add(path);
+                else
+                    menu.Items.Add(path, ExtractIcon.GetIcon(s)); //プロセスのフルパスとアイコンをメニューに追加
             }
 
             menu.Items.Add(new ToolStripSeparator()); //最後にセパレーターとCancelを追加
@@ -38,7 +49,11 @@ namespace qt1
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            menu.Show(Cursor.Position); //マウスカーソルの位置にメニューを表示
+            int x, y;
+            x = (CommandLine.left >= 0) ? CommandLine.left : Cursor.Position.X;
+            y = (CommandLine.top >= 0) ? CommandLine.top : Cursor.Position.Y;
+             
+            menu.Show(x,y); //マウスカーソルの位置にメニューを表示
             timer.Enabled = false;
         }
 
@@ -61,17 +76,17 @@ namespace qt1
             {
                 case MouseButtons.Left: //メニューを左クリック
                     System.Diagnostics.Debug.WriteLine("Left Click");
-                    KillProcess(System.IO.Path.GetFileNameWithoutExtension(item.Text));
+                    KillProcess(System.IO.Path.GetFileNameWithoutExtension(GetProcessPathFromExe(item.Text)));
                     break;
                 case MouseButtons.Right: //メニューを右クリック
                     System.Diagnostics.Debug.WriteLine("Right Click");
                     StartProcess(appSettings.rightClick,
-                                 System.IO.Path.GetDirectoryName(item.Text));
+                                 System.IO.Path.GetDirectoryName(GetProcessPathFromExe(item.Text)));
                     break;
                 case MouseButtons.Middle: //メニュー中クリック
                     System.Diagnostics.Debug.WriteLine("Middle Click");
                     StartProcess(appSettings.middleClick,
-                                 System.IO.Path.GetDirectoryName(item.Text));
+                                 System.IO.Path.GetDirectoryName(GetProcessPathFromExe(item.Text)));
                     menu.Close(); //手動でメニューを閉じる
                     break;
             }
@@ -138,10 +153,33 @@ namespace qt1
             }
         }
         /// <summary>
+        /// ファイル名からプロセス一覧にあるフルパスを返す
+        /// </summary>
+        /// <param name="exeName">プロセスのファイル名</param>
+        /// <returns></returns>
+        private string GetProcessPathFromExe(string exeName)
+        {
+            if (System.IO.File.Exists(exeName)) //元がフルパスの場合はそのまま返す
+                return exeName;
+
+            string path = string.Empty;
+            System.Diagnostics.Process[] ps =
+                System.Diagnostics.Process.GetProcessesByName(
+                    System.IO.Path.GetFileNameWithoutExtension(exeName) //拡張子を除いたファイル名でプロセスリストを取得
+                    );
+
+            foreach (System.Diagnostics.Process p in ps)
+            {
+                path = p.MainModule.FileName;
+            }
+            return path;
+        }
+
+        /// <summary>
         /// 重複を除いたプロセスの一覧を取得
         /// </summary>
         /// <returns>List<string></returns>
-        private List<string> GetProcess()
+        private List<string> GetProcessList()
         {
             List<string> lst = new List<string>();
 
