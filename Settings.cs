@@ -35,7 +35,7 @@ namespace qt1
             get
             {
                 string _rightClick = ConfigurationManager.AppSettings["rightClick"];
-                return _rightClick == null ? "Explorer.exe" : _rightClick;
+                return _rightClick == null ? "Explorer" : _rightClick;
             }
         }
 
@@ -44,7 +44,7 @@ namespace qt1
             get
             {
                 string _middleClick = ConfigurationManager.AppSettings["middleClick"];
-                return _middleClick == null ? "Explorer.exe" : _middleClick;
+                return _middleClick == null ? "Explorer" : _middleClick;
             }
         }
     }

@@ -80,24 +80,25 @@ namespace qt1
             if (item == null)
                 return;
 
+            string command = string.Empty;
+
             switch (e.Button)
             {
                 case MouseButtons.Left: //メニューを左クリック
                     System.Diagnostics.Debug.WriteLine("Left Click");
-                    KillProcess(System.IO.Path.GetFileNameWithoutExtension(GetProcessPathFromExe(item.Text)));
+                    command = appSettings.leftClick;
                     break;
                 case MouseButtons.Right: //メニューを右クリック
                     System.Diagnostics.Debug.WriteLine("Right Click");
-                    StartProcess(appSettings.rightClick,
-                                 System.IO.Path.GetDirectoryName(GetProcessPathFromExe(item.Text)));
+                    command = appSettings.rightClick;
                     break;
                 case MouseButtons.Middle: //メニュー中クリック
                     System.Diagnostics.Debug.WriteLine("Middle Click");
-                    StartProcess(appSettings.middleClick,
-                                 System.IO.Path.GetDirectoryName(GetProcessPathFromExe(item.Text)));
-                    menu.Close(); //手動でメニューを閉じる
+                    command = appSettings.middleClick;
                     break;
             }
+            ExecuteCommand(command, GetProcessPathFromExe(item.Text)); //コマンドを実行
+            menu.Close(); //手動でメニューを閉じる(中クリックではメニューを終了しないため)
         }
 
         private void menu_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
@@ -125,12 +126,12 @@ namespace qt1
                 if (e.Control)
                     m = MouseButtons.Middle;
                 menu_MouseClick(null, new MouseEventArgs(m, 1, 0, 0, 0));
-                menu.Close(); //手動でメニューを閉じる
                 return;
             }
 
-            //インクリメンタルサーチ用の検索文字の入力
-            if (e.KeyCode >= Keys.A && e.KeyCode <= Keys.Z)
+            //インクリメンタルサーチ用の検索文字の入力[0-9][A-Z]
+            if ((e.KeyCode >= Keys.A && e.KeyCode <= Keys.Z) || 
+                (e.KeyCode >= Keys.D0 && e.KeyCode <= Keys.D9))
             {
                 if (!sw.IsRunning)
                 {
@@ -145,8 +146,7 @@ namespace qt1
                         searchString = string.Empty;
                     }
                 }
-
-                searchString += e.KeyCode.ToString();
+                searchString += Convert.ToChar(e.KeyValue);
                 System.Diagnostics.Debug.WriteLine(searchString);
                 foreach (ToolStripItem i in menu.Items) //検索文字列を含むメニューアイテムを探す
                 {
@@ -179,6 +179,7 @@ namespace qt1
             foreach (System.Diagnostics.Process p in ps)
             {
                 path = p.MainModule.FileName;
+                break;
             }
             return path;
         }
@@ -219,11 +220,13 @@ namespace qt1
         /// <summary>
         /// プロセスを強制終了させる
         /// </summary>
-        /// <param name="s">プロセス名</param>
-        private void KillProcess(string s)
+        /// <param name="fullpath">プロセスのフルパス</param>
+        private void KillProcess(string fullpath)
         {
             System.Diagnostics.Process[] ps =
-                System.Diagnostics.Process.GetProcessesByName(s);
+                System.Diagnostics.Process.GetProcessesByName(
+                    System.IO.Path.GetFileNameWithoutExtension(fullpath)
+                    );
 
             foreach (System.Diagnostics.Process p in ps)
             {
@@ -234,17 +237,60 @@ namespace qt1
         /// <summary>
         /// プロセスを実行する
         /// </summary>
-        /// <param name="path">プロセスのフルパス</param>
+        /// <param name="fullpath">プロセスのフルパス</param>
         /// <param name="arg">引数</param>
-        private void StartProcess(string path, string arg)
+        private void StartProcess(string fullpath, string arg)
         {
             try
             {
-                System.Diagnostics.Process.Start(path, arg);
+                System.Diagnostics.Process.Start(fullpath, arg);
             }
-            catch (FieldAccessException e)
+            catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e.ToString());
+                MessageBox.Show(e.Message, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name + 
+                                           " ver" + 
+                                           System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+            }
+        }
+
+        /// <summary>
+        /// コマンドを実行する
+        /// </summary>
+        /// <param name="command">実行するコマンドまたは引数付きのフルパス</param>
+        /// <param name="pathFromMenu">メニューで選択したプロセスのフルパス</param>
+        private void ExecuteCommand(string command, string pathFromMenu)
+        {
+            switch(command.ToLower())
+            {
+                case "terminate":
+                    KillProcess(pathFromMenu);
+                    break;
+                case "explorer":
+                    StartProcess(GetProcessPathFromExe("explorer"), 
+                                 System.IO.Path.GetDirectoryName(pathFromMenu));
+                    break;
+                case "reboot":
+                    KillProcess(pathFromMenu);
+                    StartProcess(pathFromMenu, string.Empty);
+                    break;
+                case "":
+                    break;
+                default: //コマンド以外の場合はapp.configで設定したClickのValue(例:C:\test\test.exe %D)
+                    string c = string.Empty;
+                    System.Text.RegularExpressions.Regex r =
+                        new System.Text.RegularExpressions.Regex(@"([A-Z]\:\\|\\\\).*\.exe",
+                        System.Text.RegularExpressions.RegexOptions.IgnoreCase | 
+                        System.Text.RegularExpressions.RegexOptions.Singleline);
+                    System.Text.RegularExpressions.Match m = r.Match(command); //パスと引数に分解
+                    if (m.Success)
+                        c = m.Value;
+                    string args = command.Substring(m.Length).Trim().
+                        Replace("%D", System.IO.Path.GetDirectoryName(pathFromMenu)).
+                        Replace("%F", System.IO.Path.GetFileName(pathFromMenu));
+
+                    StartProcess(c, args);
+                    break;
             }
         }
 
