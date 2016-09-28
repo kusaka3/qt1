@@ -46,7 +46,7 @@ Enterが左クリック、Shift+Enterが右クリック、Ctrl+Enterが中クリ
 
 | key | Value | 説明 |
 | --- | ----- | --- |
-|exceptWords|System32,systemapps|除外ワードを指定(パスの一部)<br>複数設定したい場合は,で区切る|
+|exceptWords|除外ワード,除外ワード|非表示にしたいパスの一部を除外ワードとして指定<br>複数設定したい場合は,で区切る|
 |leftClick<br>rightClick<br>middleClick|Terminate<br>Explorer<br>Reboot<br>アプリケーションのパス %D<br>アプリケーションのパス %D\%F|選択したプロセスを強制終了<br>選択したプロセスの親フォルダをExplorerで開く<br>選択したプロセスを再起動(強制終了後に新しく起動)<br>指定したアプリケーションに選択したプロセスの親フォルダを渡す<br>指定したアプリケーションに選択したプロセスのフルパスを渡す|
 
 例)
@@ -61,7 +61,7 @@ Enterが左クリック、Shift+Enterが右クリック、Ctrl+Enterが中クリ
 
 - /top=Y メニュー出現位置Y
 - /left=X メニュー出現位置X
-- /nopathname プロセス表記をパス名ではなくファイル名のみにする
+- /nopathname プロセス表示にパス名を含めずファイル名のみにする
 - /noicon アイコン非表示
 
 ## 既知の不具合
