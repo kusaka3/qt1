@@ -4,20 +4,63 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
+using System.Runtime.InteropServices;
 
 namespace qt1
 {
     public class Settings
     {
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        private static extern int GetPrivateProfileString(
+            string lpApplicationName,
+            string lpKeyName,
+            string lpDefault,
+            StringBuilder lpReturnedstring,
+            int nSize,
+            string lpFileName);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        private static extern int WritePrivateProfileString(
+            string lpApplicationName,
+            string lpKeyName,
+            string lpstring,
+            string lpFileName);
+
+        string filePath;
+        string sectionName = "Settings";
+
+        public Settings()
+        {
+            filePath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\qt1.ini";
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                this[sectionName, "exceptWords"] = string.Empty;
+                this[sectionName, "leftClick"] = "Terminate";
+                this[sectionName, "rightClick"] = "Explorer";
+                this[sectionName, "middleClick"] = "Reboot";
+            }
+        }
+
+        private string this[string section, string key, string def = ""]
+        {
+            set
+            {
+                WritePrivateProfileString(section, key, value, filePath);
+            }
+            get
+            {
+                StringBuilder sb = new StringBuilder(256);
+                GetPrivateProfileString(section, key, def, sb, sb.Capacity, filePath);
+                return sb.ToString();
+            }
+        }
+
         public string[] exceptWords
         {
             get
             {
-                string _exceptWords = ConfigurationManager.AppSettings["exceptWords"];
-                if (_exceptWords == null)
-                    return new string[1] { "" };
-                else
-                    return _exceptWords.Split(',');
+                return this[sectionName, "exceptWords"].Split(',');
             }
         }
 
@@ -25,8 +68,7 @@ namespace qt1
         {
             get
             {
-                string _leftClick = ConfigurationManager.AppSettings["leftClick"];
-                return _leftClick == null ? "Terminate" : _leftClick;
+                return this[sectionName, "leftClick"];
             }
         }
 
@@ -34,8 +76,7 @@ namespace qt1
         {
             get
             {
-                string _rightClick = ConfigurationManager.AppSettings["rightClick"];
-                return _rightClick == null ? "Explorer" : _rightClick;
+                return this[sectionName, "rightClick"];
             }
         }
 
@@ -43,8 +84,7 @@ namespace qt1
         {
             get
             {
-                string _middleClick = ConfigurationManager.AppSettings["middleClick"];
-                return _middleClick == null ? "Explorer" : _middleClick;
+                return this[sectionName, "middleClick"];
             }
         }
     }
