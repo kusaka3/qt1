@@ -56,13 +56,21 @@ namespace qt1
 
         private void timer_Tick(object sender, EventArgs e)
         {
+            timer.Enabled = false;
+
+            if (System.IO.File.Exists(CommandLine.exePath)) //コマンドラインにexeのパスが渡された
+            {
+                KillProcess(CommandLine.exePath);
+                Application.Exit(); //自分自身を終了させる
+                return;
+            }
+
             int x, y;
             x = (CommandLine.left >= 0) ? CommandLine.left : Cursor.Position.X;
             y = (CommandLine.top >= 0) ? CommandLine.top : Cursor.Position.Y;
 
             menu.Show(x, y); //マウスカーソルの位置にメニューを表示
             menu.BringToFront();
-            timer.Enabled = false;
         }
 
         private void menu_MouseClick(object sender, MouseEventArgs e)
@@ -152,7 +160,6 @@ namespace qt1
                 {
                     if (i.Text.ToUpper().Contains(searchString))
                     {
-
                         i.Select();
                         break;
                     }

@@ -8,10 +8,11 @@ namespace qt1
 {
     public class CommandLineArgs
     {
-        public bool noIcons { get; }
-        public bool noPathName { get; }
-        public int top { get; }
-        public int left { get; }
+        public bool noIcons { get; }    // /noicon
+        public bool noPathName { get; } // /nopathname
+        public int top { get; }         // /top
+        public int left { get; }        // /left
+        public string exePath { get; }  // exeのパス
 
         public CommandLineArgs()
         {
@@ -19,8 +20,10 @@ namespace qt1
             noPathName = false;
             top = -1;
             left = -1;
+            exePath = string.Empty;
 
             string[] args = System.Environment.GetCommandLineArgs();
+            args[0] = ""; //最初の要素は必ず自分自身のパスなので削除
             foreach(string arg in args)
             {
                 if (arg.ToLower() == "/noicon")
@@ -39,6 +42,8 @@ namespace qt1
                     if (int.TryParse(arg.Split('=')[1], out value))
                         left = value;
                 }
+                if (arg.Contains(".exe"))
+                    exePath = arg;
             }
         }
 
