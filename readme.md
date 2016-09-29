@@ -18,8 +18,8 @@ Windows 10 32bit/64bit + .NETFramework v4.5.2
 
 - 実行中のプロセスをパス付きでメニューに表示
 - パスの一部でインクリメンタルサーチ
-- プロセスを強制終了
-- プロセスを再起動
+- プロセスの強制終了
+- プロセスの再起動
 - プロセスのフォルダを開く
 - 任意のアプリケーションに選択したプロセスのパスを渡して実行
 
@@ -31,7 +31,7 @@ Windows 10 32bit/64bit + .NETFramework v4.5.2
 
 ## ダウンロード
 
-[Releases](https://github.com/kusaka3/qt1/releases) から最新版をダウンロードしてください。
+[releases](https://github.com/kusaka3/qt1/releases) から最新版をダウンロードしてください。
 
 ## インストールとアンインストール
 
@@ -63,7 +63,7 @@ qt1.exeを初めて起動するとqt1.iniが作成されます。<br>
 |exceptWords|除外ワード,除外ワード|非表示にしたいパスの一部を除外ワードとして指定<br>複数設定したい場合は,で区切る|
 |leftClick<br>rightClick<br>middleClick|Terminate<br>Explorer<br>Reboot<br>アプリケーションのパス %D<br>アプリケーションのパス %D\%F|選択したプロセスを強制終了<br>選択したプロセスの親フォルダをExplorerで開く<br>選択したプロセスを再起動(強制終了後に新しく起動)<br>指定したアプリケーションに選択したプロセスの親フォルダを渡す<br>指定したアプリケーションに選択したプロセスのフルパスを渡す|
 
-設定例)
+設定例
 - [system32]と[systemapps]と[common files]を含むプロセスを表示しない
 - 左クリック：選択したプロセスを強制終了
 - 右クリック：ファイラー(NyanFi)の左ファイルリストに選択したプロセスのフォルダを渡す
