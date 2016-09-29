@@ -1,16 +1,18 @@
 # qt1
 
-「qt0」を模倣した64bitプロセス対応のメニュー式タスクマネージャ
+「qt0」を模倣した64bit対応のメニュー式タスクマネージャ
 
 ![qt1](./Preview.png)
 
 ## 概要
 
-10年以上愛用している「qt0」が64bit未対応の為、64bitプロセスを表示しつつも「qt0」っぽい動きをするアプリケーションを作りました。.NETFrameworkを使用した簡易版です。
+64bit対応のメニュー式タスクマネージャです。<br>
+プロセスの強制終了・再起動・フォルダを開く・任意のアプリケーションに渡すといった操作ができます。<br>
+作成にあたっては10年以上愛用している「qt0」を参考にさせていただきました。
 
 ## 対応OS
 
-Windows 10 .NETFramework v4.5.2
+Windows 10 32bit/64bit + .NETFramework v4.5.2
 
 ## 機能
 
@@ -18,22 +20,29 @@ Windows 10 .NETFramework v4.5.2
 - パスの一部でインクリメンタルサーチ
 - プロセスを強制終了
 - プロセスを再起動
-- プロセスのフォルダをExplorerで開く
+- プロセスのフォルダを開く
 - 任意のアプリケーションに選択したプロセスのパスを渡して実行
 
 ### 独自の機能
 
 - 64bitプロセスの表示
 - 重複したプロセスを省略
-- 指定ワードを含むプロセスをリストから除外(例：system32)
+- 除外ワードを指定して特定のパスを含むプロセスを表示しない(例：system32以下のプロセスなど)
+
+## インストールとアンインストール
+
+任意の場所にqt1.exeとqt1.exe.configを配置してださい。<br>
+不要になったらファイルを削除してください。<br>
+レジストリは使用していません。
 
 ## 使用方法
 
-qt1.exeをドラッグしてタスクバーに追加(ピン留め)するか、愛用のランチャー等に追加して起動してください。
+qt1.exeをドラッグしてタスクバーに追加(ピン留め)するか、愛用のランチャー等に追加して起動してください。<br>
+後述する起動オプションで指定していない場合は、マウスの位置にメニューを表示します。
 
 デフォルト設定では以下の通りの動作を行います。
 - 左クリック：選択したプロセスを強制終了
-- 右クリック：選択したプロセスのパスをExplorerで開く
+- 右クリック：選択したプロセスのフォルダをExplorerで開く
 - 中クリック：選択したプロセスを再起動(強制終了した後に起動)
 
 ### キーボードでの操作方法
@@ -41,7 +50,8 @@ qt1.exeをドラッグしてタスクバーに追加(ピン留め)するか、�
 
 Enterが左クリック、Shift+Enterが右クリック、Ctrl+Enterが中クリックに割り当てられています。
 
-### qt1.exe.config
+### qt1.ini
+qt1.exeを初めて起動するとqt1.iniが作成されます。<br>
 このファイルを編集することで特定の文字列を含むプロセスを非表示にしたり、クリック時の動作を変更することができます。
 
 | key | Value | 説明 |
@@ -49,12 +59,18 @@ Enterが左クリック、Shift+Enterが右クリック、Ctrl+Enterが中クリ
 |exceptWords|除外ワード,除外ワード|非表示にしたいパスの一部を除外ワードとして指定<br>複数設定したい場合は,で区切る|
 |leftClick<br>rightClick<br>middleClick|Terminate<br>Explorer<br>Reboot<br>アプリケーションのパス %D<br>アプリケーションのパス %D\%F|選択したプロセスを強制終了<br>選択したプロセスの親フォルダをExplorerで開く<br>選択したプロセスを再起動(強制終了後に新しく起動)<br>指定したアプリケーションに選択したプロセスの親フォルダを渡す<br>指定したアプリケーションに選択したプロセスのフルパスを渡す|
 
-例)
+設定例)
+- [system32]と[systemapps]と[common files]を含むプロセスを表示しない
+- 左クリック：選択したプロセスを強制終了
+- 右クリック：ファイラー(NyanFi)の左ファイルリストに選択したプロセスのフォルダを渡す
+- 中クリック：バイナリエディタ(BZ)に選択したプロセスのフルパスを渡す
+
 ```
-<add key="exceptWords" value="system32,systemapps,common files" />
-<add key="leftClick" value="Terminate" />
-<add key="rightClick" value="C:\nyanfi\NyanFi.exe -L%D"/>
-<add key="middleClick" value="C:\WinHex\WinHex.exe %D\%F"/>
+[Settings]
+exceptWords=system32,systemapps,common files
+leftClick=Terminate
+rightClick=C:\nyanfi\NyanFi.exe -L"%D"
+middleClick=C:\BZ\Bz.exe "%D\%F"
 ```
 
 ## 起動オプション
@@ -63,6 +79,7 @@ Enterが左クリック、Shift+Enterが右クリック、Ctrl+Enterが中クリ
 - /left=X メニュー出現位置X
 - /nopathname プロセス表示にパス名を含めずファイル名のみにする
 - /noicon アイコン非表示
+- EXEのパス EXEが実行しているプロセスを全て強制終了(パスにスペースを含む場合は""で囲む)
 
 ## 既知の不具合
 
@@ -70,7 +87,7 @@ Enterが左クリック、Shift+Enterが右クリック、Ctrl+Enterが中クリ
 
 ## ToDo
 
-- 起動オプションにEXEのパスを指定すると該当するプロセスを全て終了させる
+- 起動オプションに/rebootを実装
 
 ## 実装しなかった機能
 
