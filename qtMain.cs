@@ -255,9 +255,9 @@ namespace qt1
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e.ToString());
-                MessageBox.Show(e.Message, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name + 
+                MessageBox.Show(e.Message, Application.ProductName + 
                                            " ver" + 
-                                           System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+                                           Application.ProductVersion);
             }
         }
 
