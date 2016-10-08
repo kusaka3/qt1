@@ -138,7 +138,7 @@ namespace qt1
             }
 
             //インクリメンタルサーチ用の検索文字の入力[0-9][A-Z]
-            if ((e.KeyCode >= Keys.A && e.KeyCode <= Keys.Z) || 
+            if ((e.KeyCode >= Keys.A && e.KeyCode <= Keys.Z) ||
                 (e.KeyCode >= Keys.D0 && e.KeyCode <= Keys.D9))
             {
                 if (!sw.IsRunning)
@@ -237,8 +237,18 @@ namespace qt1
 
             foreach (System.Diagnostics.Process p in ps)
             {
-                p.Kill();
-            }
+                try
+                {
+                    p.Kill();
+                }
+                catch(Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine(e.ToString());
+                    MessageBox.Show(e.Message, Application.ProductName +
+                                               " ver" +
+                                               Application.ProductVersion);
+                }
+}
         }
 
         /// <summary>
@@ -255,8 +265,8 @@ namespace qt1
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e.ToString());
-                MessageBox.Show(e.Message, Application.ProductName + 
-                                           " ver" + 
+                MessageBox.Show(e.Message, Application.ProductName +
+                                           " ver" +
                                            Application.ProductVersion);
             }
         }
@@ -268,13 +278,13 @@ namespace qt1
         /// <param name="pathFromMenu">メニューで選択したプロセスのフルパス</param>
         private void ExecuteCommand(string command, string pathFromMenu)
         {
-            switch(command.ToLower())
+            switch (command.ToLower())
             {
                 case "terminate":
                     KillProcess(pathFromMenu);
                     break;
                 case "explorer":
-                    StartProcess(GetProcessPathFromExe("explorer"), 
+                    StartProcess(GetProcessPathFromExe("explorer"),
                                  System.IO.Path.GetDirectoryName(pathFromMenu));
                     break;
                 case "reboot":
@@ -287,7 +297,7 @@ namespace qt1
                     string c = string.Empty;
                     System.Text.RegularExpressions.Regex r =
                         new System.Text.RegularExpressions.Regex(@"([A-Z]\:\\|\\\\).*\.exe",
-                        System.Text.RegularExpressions.RegexOptions.IgnoreCase | 
+                        System.Text.RegularExpressions.RegexOptions.IgnoreCase |
                         System.Text.RegularExpressions.RegexOptions.Singleline);
                     System.Text.RegularExpressions.Match m = r.Match(command); //パスと引数に分解
                     if (m.Success)
