@@ -31,7 +31,7 @@ namespace qt1
 
         public Settings()
         {
-            filePath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\qt1.ini";
+            filePath = AppDomain.CurrentDomain.BaseDirectory + @"qt1.ini";
 
             if (!System.IO.File.Exists(filePath))
             {
