@@ -313,5 +313,10 @@ namespace qt1
                     break;
             }
         }
+
+        private void menu_Closed(object sender, ToolStripDropDownClosedEventArgs e)
+        {
+            Application.Exit(); //自分自身を終了させる
+        }
     }
 }
