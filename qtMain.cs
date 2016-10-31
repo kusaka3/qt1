@@ -85,8 +85,11 @@ namespace qt1
                 }
             }
 
-            if (item == null)
+            if (item == null || item.Text == "Cancel")
+            {
+                Application.Exit(); //自分自身を終了させる
                 return;
+            }
 
             string command = string.Empty;
 
@@ -309,11 +312,6 @@ namespace qt1
                     StartProcess(c, args);
                     break;
             }
-        }
-
-        private void menu_Closed(object sender, ToolStripDropDownClosedEventArgs e)
-        {
-            Application.Exit(); //自分自身を終了させる
         }
     }
 }
